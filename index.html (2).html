@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharp Smiles Waiting Room</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#f5f2ee;font-family:Georgia,serif;overflow:hidden}
+#screen{width:100vw;height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+#header{background:#fff;border-bottom:2px solid #e4ddd3;padding:14px 44px;display:flex;justify-content:space-between;align-items:center}
+#logo{max-height:70px;width:auto;object-fit:contain;display:block}
+#clock-wrap{text-align:right}
+#clock{font-size:54px;font-weight:300;color:#1a1a1a;letter-spacing:-2px;line-height:1}
+#date-line{font-size:15px;color:#999;margin-top:4px;font-family:Arial,sans-serif}
+#national-day{font-size:14px;color:#3d6b45;margin-top:4px;font-family:Arial,sans-serif;font-weight:700;min-height:20px}
+#body{display:grid;grid-template-columns:3fr 2fr;overflow:hidden}
+#tip-panel{background:#1a2e1e;display:flex;flex-direction:column;justify-content:center;padding:48px 56px;overflow:hidden}
+#tip-category{font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:Arial,sans-serif;margin-bottom:18px}
+#tip-title{font-size:36px;font-weight:300;color:#fff;line-height:1.3;margin-bottom:16px}
+#tip-detail{font-size:17px;color:rgba(255,255,255,0.7);line-height:1.85;font-family:Arial,sans-serif;max-width:500px}
+#tip-progress{height:2px;background:rgba(255,255,255,0.1);border-radius:1px;margin-top:32px;max-width:500px;overflow:hidden}
+#tip-fill{height:100%;background:rgba(255,255,255,0.5);border-radius:1px;width:0%;transition:width .1s linear}
+#tip-dots{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;max-width:500px}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:background .4s}
+.dot.active{background:rgba(255,255,255,0.85)}
+#side-panel{background:#f5f2ee;padding:22px 26px;display:flex;flex-direction:column;gap:13px;justify-content:center}
+.card{background:#fff;border:1px solid #e4ddd3;border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:13px}
+.card-icon{width:38px;height:38px;border-radius:50%;background:#edeae4;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.card h3{font-size:14px;font-weight:700;color:#1a2e1e;font-family:Arial,sans-serif;margin-bottom:4px}
+.card p{font-size:12px;color:#888;line-height:1.6;font-family:Arial,sans-serif}
+#footer{background:#fff;border-top:2px solid #e4ddd3;padding:14px 44px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+#fact-text{font-size:14px;color:#555;font-family:Arial,sans-serif;line-height:1.5;flex:1}
+#fact-text b{color:#1a2e1e}
+#tagline{font-size:13px;color:#bbb;font-family:Arial,sans-serif;white-space:nowrap;text-align:right}
+</style>
+</head>
+<body>
+<div id="screen">
+<div id="header">
+  <img id="logo" src="data:image/png;base64,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" alt="Sharp Smiles Modern Dentistry and Implants">
+  <div id="clock-wrap">
+    <div id="clock">--:--</div>
+    <div id="date-line">&nbsp;</div>
+    <div id="national-day">&nbsp;</div>
+  </div>
+</div>
+<div id="body">
+  <div id="tip-panel">
+    <div id="tip-category">&nbsp;</div>
+    <div id="tip-title">&nbsp;</div>
+    <div id="tip-detail">&nbsp;</div>
+    <div id="tip-progress"><div id="tip-fill"></div></div>
+    <div id="tip-dots"></div>
+  </div>
+  <div id="side-panel">
+    <div class="card"><div class="card-icon">&#x1F9B7;</div><div><h3>Brush twice a day</h3><p>Two minutes, twice daily with a soft-bristled brush removes plaque and helps prevent gum disease.</p></div></div>
+    <div class="card"><div class="card-icon">&#x1F9F5;</div><div><h3>Floss once a day</h3><p>Brushing only cleans 60% of tooth surfaces. Flossing reaches the rest where cavities love to hide.</p></div></div>
+    <div class="card"><div class="card-icon">&#x1F4A7;</div><div><h3>Water is nature's rinse</h3><p>Drinking water throughout the day washes away sugar and bacteria and keeps saliva flowing naturally.</p></div></div>
+    <div class="card"><div class="card-icon">&#x1F4C5;</div><div><h3>Regular checkups matter</h3><p>Every 6 months lets us catch small problems early before they become bigger and costlier issues.</p></div></div>
+  </div>
+</div>
+<div id="footer">
+  <div id="fact-text">Loading...</div>
+  <div id="tagline">Sharp Smiles &middot; Modern Dentistry &amp; Implants</div>
+</div>
+</div>
+<script>
+var nd={"1-1":"New Year's Day","1-4":"National Trivia Day","1-8":"National Bubble Bath Day","1-15":"National Bagel Day","1-21":"National Hugging Day","1-24":"National Compliment Day","1-29":"National Puzzle Day","2-2":"Groundhog Day","2-9":"National Pizza Day","2-14":"Valentine's Day","2-17":"National Random Acts of Kindness Day","2-20":"National Love Your Pet Day","3-7":"National Cereal Day","3-8":"International Women's Day","3-10":"National Mario Day","3-14":"Pi Day","3-17":"St. Patrick's Day","3-20":"First Day of Spring","3-23":"National Puppy Day","3-25":"National Waffle Day","4-1":"April Fools Day","4-7":"National Beer Day","4-10":"National Siblings Day","4-11":"National Pet Day","4-22":"Earth Day","4-26":"National Pretzel Day","4-28":"National Superhero Day","4-29":"National Dance Day","5-4":"Star Wars Day","5-5":"Cinco de Mayo","5-6":"National Nurses Day","5-9":"National Lost Sock Memorial Day","5-11":"National Eat What You Want Day","5-14":"National Dance Like a Chicken Day","5-21":"National Pizza Party Day","5-25":"National Wine Day","5-28":"National Hamburger Day","5-31":"National Smile Day","6-3":"National Donut Day","6-4":"National Cheese Day","6-5":"World Environment Day","6-8":"National Best Friends Day","6-14":"Flag Day","6-15":"National Smile Power Day","6-19":"Juneteenth","6-21":"First Day of Summer","6-27":"National Sunglasses Day","7-4":"Independence Day","7-10":"National Kitten Day","7-17":"World Emoji Day","7-20":"National Moon Day","7-30":"National Cheesecake Day","7-31":"National Avocado Day","8-3":"National Watermelon Day","8-4":"National Chocolate Chip Cookie Day","8-9":"National Book Lovers Day","8-16":"National Tell a Joke Day","8-22":"National Tooth Fairy Day","8-26":"National Dog Day","9-5":"National Cheese Pizza Day","9-9":"National Teddy Bear Day","9-16":"National Guacamole Day","9-19":"National Talk Like a Pirate Day","9-22":"First Day of Fall","9-25":"National Comic Book Day","9-26":"National Dumpling Day","9-29":"National Coffee Day","10-1":"National Homemade Cookie Day","10-4":"National Taco Day","10-10":"World Mental Health Day","10-14":"National Dessert Day","10-17":"National Pasta Day","10-22":"National Nut Day","10-26":"National Pumpkin Day","10-29":"National Cat Day","10-31":"Halloween","11-3":"National Sandwich Day","11-8":"National STEM Day","11-11":"Veterans Day","11-14":"National Pickle Day","11-23":"National Espresso Day","12-4":"National Cookie Day","12-8":"National Brownie Day","12-12":"National Cocoa Day","12-21":"First Day of Winter","12-24":"Christmas Eve","12-25":"Christmas Day","12-31":"New Year's Eve"};
+var cards=[
+{c:"Dental Tip",t:"Brush for a full two minutes",d:"Most people brush for only 45 seconds. Try a timer - two full minutes twice a day removes significantly more plaque and cuts cavity risk in half."},
+{c:"Dental Tip",t:"Your toothbrush has a shelf life",d:"Replace it every 3 to 4 months, or sooner if bristles fray. Worn bristles are far less effective and can harbor bacteria you do not want in your mouth."},
+{c:"Dental Tip",t:"Teeth are not tools",d:"Using teeth to open packages, crack nuts, or chew ice creates tiny fractures over time that can turn into chips or broken teeth. Use scissors instead."},
+{c:"Dental Tip",t:"Gum disease affects your whole body",d:"Research links periodontal disease to heart disease, diabetes, and pregnancy complications. Healthy gums are not just about your smile - they affect total health."},
+{c:"Dental Tip",t:"Sensitivity is a signal from your mouth",d:"Tooth sensitivity to hot, cold, or sweet is your mouth asking for attention. It can mean enamel wear, a cavity, or gum recession - all treatable when caught early."},
+{c:"Dental Tip",t:"Night guards protect your investment",d:"Up to 10% of people grind their teeth during sleep without knowing it. A custom night guard absorbs the pressure and prevents thousands of dollars in damage."},
+{c:"Dental Tip",t:"Sugar feeds cavity-causing bacteria",d:"When you eat sugar, bacteria produce acid that attacks enamel for up to 20 minutes. Rinsing with water after sweets helps neutralize the acid quickly."},
+{c:"Fun Fact",t:"Sharks grow up to 50,000 teeth in a lifetime",d:"Unlike humans who get just two sets, sharks continuously grow new rows throughout their lives, replacing them every 1 to 2 weeks. Nature's dental plan!"},
+{c:"Fun Fact",t:"Honey never expires",d:"Archaeologists found 3,000-year-old honey in Egyptian tombs that was still edible. Its low moisture and natural hydrogen peroxide make it last indefinitely."},
+{c:"Fun Fact",t:"A day on Venus is longer than its year",d:"Venus rotates so slowly that one day is 243 Earth days - longer than its year of 225 Earth days. It also spins backwards compared to most planets."},
+{c:"Fun Fact",t:"Octopuses have three hearts",d:"Two pump blood to the gills and one pumps it to the body. When an octopus swims the main heart stops beating - which is why they prefer to crawl."},
+{c:"Fun Fact",t:"The Eiffel Tower grows in summer",d:"Heat causes the iron to expand, making it about 6 inches taller on hot days. In winter it shrinks back down. Thermal expansion at its most famous."},
+{c:"Fun Fact",t:"Cleopatra lived closer to us than to the pyramids",d:"Cleopatra lived around 30 BC. The Great Pyramid was built around 2560 BC. The moon landing was 1969. She was closer in time to us than to the pyramid builders."},
+{c:"Fun Fact",t:"Crows hold grudges and warn their friends",d:"Studies show crows remember faces that threatened them and warn other crows, passing the knowledge across generations. They also hold something like funerals."},
+{c:"Fun Fact",t:"Bananas are berries but strawberries are not",d:"Botanically, a berry develops from a single flower's ovary. Bananas qualify. Strawberries and raspberries technically do not - they are aggregate fruits."},
+{c:"Fun Fact",t:"Lightning is hotter than the surface of the sun",d:"Lightning reaches around 30,000 Kelvin - about five times hotter than the surface of the sun. It lasts only milliseconds but releases enormous energy."},
+{c:"Fun Fact",t:"The shortest war in history lasted 38 minutes",d:"The Anglo-Zanzibar War of 1896 began at 9:02 AM and ended by 9:40 AM, making it officially the shortest recorded war in history."},
+{c:"Fun Fact",t:"Trees communicate underground",d:"Forests are connected by vast fungal networks called the Wood Wide Web through which trees share water, carbon, and chemical warning signals with neighbors."},
+{c:"Fun Fact",t:"Your body makes 25 million new cells every second",d:"In the time it takes to read this your body has produced millions of new cells. In one day you replace roughly 330 billion cells, mostly blood and skin."},
+{c:"Fun Fact",t:"Wombat droppings are cube-shaped",d:"Wombats are the only animals known to produce cube-shaped droppings. The shape helps them stack and not roll away, used to mark territory on rocks and logs."},
+{c:"Fun Fact",t:"A group of flamingos is called a flamboyance",d:"A group of owls is a parliament. A group of cats is a clowder. A group of crows is a murder. Animal group names are wonderfully dramatic."},
+{c:"Health Tip",t:"A short walk every hour makes a big difference",d:"Extended sitting slows metabolism and raises heart disease risk. Just a 5-minute walk each hour counteracts many of these effects remarkably well."},
+{c:"Health Tip",t:"Sleep is when your body does its best work",d:"During deep sleep your body releases growth hormone, repairs tissues, and clears brain waste. Seven to nine hours is not a luxury - it is essential maintenance."},
+{c:"Health Tip",t:"Laughter is genuinely good medicine",d:"Laughing boosts immune cells, releases endorphins, and reduces stress hormones by up to 39 percent. A good laugh actively supports healing."},
+{c:"Health Tip",t:"Sunscreen works even on cloudy days",d:"Up to 80 percent of UV rays pass through clouds. Daily SPF 30 or higher is the single most recommended anti-aging and skin cancer prevention habit."},
+{c:"Health Tip",t:"Drinking more water has no downside",d:"Water flushes toxins, carries nutrients to cells, cushions joints, and regulates temperature. Most adults need around 8 cups a day, more if active."},
+{c:"Did You Know?",t:"Ancient Egyptians had their own toothpaste",d:"Around 5,000 years ago Egyptians made dental powder from ground ox hooves, ashes, burnt eggshells, and pumice. Romans later added crushed bones. Not exactly minty."},
+{c:"Did You Know?",t:"Your tongue print is completely unique",d:"Like fingerprints, everyone's tongue has a unique shape and texture. Researchers are exploring tongue recognition as a future biometric identification method."},
+{c:"Did You Know?",t:"Enamel is the hardest substance your body produces",d:"Harder than bone, enamel rates 5 on the Mohs hardness scale. Unlike bone it cannot regenerate - once it is gone it is gone. Prevention matters most."},
+{c:"Did You Know?",t:"The first dental drill used a foot pedal",d:"Invented in 1871 by James B. Morrison, the foot-engine drill worked like a spinning wheel. It revolutionized dentistry though far slower than today's versions."},
+{c:"Did You Know?",t:"Smiling releases real feel-good chemicals",d:"Smiling triggers the release of endorphins, dopamine, and serotonin. Even a small smile has measurable effects on your mood and stress levels."}
+];
+var facts=[
+"The average person produces <b>25,000 quarts of saliva</b> in a lifetime - enough to fill two swimming pools. Saliva is your mouth's first line of defense against bacteria.",
+"<b>Smiling is contagious</b> - mirror neurons in your brain automatically fire when you see someone smile, making it nearly impossible not to smile back.",
+"Tooth enamel is the <b>hardest substance the human body produces</b>, yet it cannot regenerate. Once it is worn away it is gone - which is exactly why prevention matters.",
+"A <b>hummingbird's heart beats up to 1,260 times per minute</b> during flight. At rest it slows to a still-impressive 250 beats per minute.",
+"The inventors of <b>Post-it Notes</b> originally considered the product a failure because the adhesive was not sticky enough. It became one of the best-selling office products ever.",
+"Flossing once a day can help <b>reduce your risk of heart disease</b> - chronic gum inflammation is directly linked to cardiovascular problems according to multiple studies.",
+"The average human bites with <b>150 to 200 pounds of force</b>. Dental implants are designed to withstand the same force as natural teeth, making them a lifetime solution.",
+"Astronauts on the <b>International Space Station grow about 2 inches taller</b> in space because the spine decompresses without gravity. They shrink back on return to Earth.",
+"<b>Brushing too hard</b> is actually damaging - it wears enamel and pushes gums back. A soft-bristled brush with gentle circular pressure is always the right technique.",
+"The average person walks about <b>100,000 miles in a lifetime</b> - roughly four times around the Earth. Regular checkups keep both your feet and your smile going the distance.",
+"Your mouth is home to more than <b>700 species of bacteria</b>. Most are harmless but a small number cause cavities and gum disease. Regular cleaning keeps the balance right.",
+"Trees in a forest share nutrients through a <b>fungal network underground</b>. Scientists call it the Wood Wide Web - nature's original internet, predating ours by millions of years.",
+"The human nose can detect <b>over one trillion distinct smells</b> - yet we only have words for a tiny fraction. The smell of rain on dry earth is called petrichor.",
+"<b>Laughter reduces cortisol</b> - the primary stress hormone - by up to 39 percent. A good laugh in the waiting room might actually make your appointment go more smoothly.",
+"Sharks have been around for <b>450 million years</b> - predating dinosaurs, trees, and many insects. They have survived five mass extinctions almost completely unchanged.",
+"The <b>Great Wall of China is not visible from space</b> with the naked eye - it is too narrow. Astronauts have confirmed this, debunking one of history's most durable myths.",
+"<b>Honey is the only food that never spoils</b>. Archaeologists have eaten 3,000-year-old honey found in Egyptian tombs and reported it tasted perfectly fine.",
+"A <b>group of pandas</b> is called an embarrassment. A group of jellyfish is a smack. A group of rhinos is a crash. Animal group names are wonderfully dramatic."
+];
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}}
+shuffle(cards);shuffle(facts);
+var tipIdx=0,factIdx=0,start=Date.now(),INTERVAL=13000;
+function pad(n){return n<10?'0'+n:n;}
+function updateClock(){
+  var n=new Date();
+  var h=n.getHours(),m=n.getMinutes();
+  var ap=h>=12?'PM':'AM',h12=h%12||12;
+  document.getElementById("clock").textContent=h12+":"+pad(m)+" "+ap;
+  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("date-line").textContent=days[n.getDay()]+", "+months[n.getMonth()]+" "+n.getDate()+", "+n.getFullYear();
+  var key=(n.getMonth()+1)+'-'+n.getDate();
+  var day=nd[key];
+  document.getElementById("national-day").textContent=day?"Today is "+day+" 🎉":" ";
+}
+function renderDots(total,active){
+  var el=document.getElementById("tip-dots");
+  el.innerHTML='';
+  var show=Math.min(total,12);
+  for(var i=0;i<show;i++){
+    var d=document.createElement('div');
+    d.className='dot'+(i===active?' active':'');
+    el.appendChild(d);
+  }
+}
+function showCard(i){
+  var c=cards[i%cards.length];
+  document.getElementById("tip-category").textContent=c.c;
+  document.getElementById("tip-title").textContent=c.t;
+  document.getElementById("tip-detail").textContent=c.d;
+  renderDots(cards.length,i%cards.length);
+}
+function showFact(i){
+  document.getElementById("fact-text").innerHTML=facts[i%facts.length];
+}
+showCard(0);showFact(0);updateClock();
+setInterval(updateClock,1000);
+setInterval(function(){
+  var e=Date.now()-start;
+  document.getElementById("tip-fill").style.width=Math.min((e/INTERVAL)*100,100)+"%";
+  if(e>=INTERVAL){tipIdx++;factIdx++;showCard(tipIdx);showFact(factIdx);start=Date.now();}
+},100);
+</script>
+</body>
+</html>
